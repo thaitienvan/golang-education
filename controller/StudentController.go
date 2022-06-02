@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"interview/models"
 	"interview/services"
 	"net/http"
@@ -27,22 +26,14 @@ func GetStudentById(c *gin.Context) {
 }
 func GetStudent(c *gin.Context) {
 	sqlConnInterface, _ := c.Get("sqlConnection")
-	sqlConn := sqlConnInterface.(*sql.DB)
-	rows, err := sqlConn.Query("select * from student")
+
+	students, err := services.GetStudent(sqlConnInterface)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		c.IndentedJSON(http.StatusOK, students)
 	}
-	var students []models.Student
-	for rows.Next() {
-		var st models.Student
-		err := rows.Scan(&st.Id, &st.FullName, &st.BirthDay, &st.PhoneNum, &st.Email)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
-			return
-		}
-		students = append(students, st)
-	}
-	c.IndentedJSON(http.StatusOK, students)
+
 }
 func PostStudent(c *gin.Context) {
 	sqlConnInterface, _ := c.Get("sqlConnection")
