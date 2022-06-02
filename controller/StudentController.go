@@ -46,23 +46,28 @@ func GetStudent(c *gin.Context) {
 }
 func PostStudent(c *gin.Context) {
 	sqlConnInterface, _ := c.Get("sqlConnection")
-	sqlConn := sqlConnInterface.(*sql.DB)
-
 	var st models.Student
 	if err := c.BindJSON(&st); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	inResult, err := sqlConn.Exec("INSERT INTO student(fullname,birthday,phone_num,email) VALUES (?, ?, ?, ?)", st.FullName, st.BirthDay, st.PhoneNum, st.Email)
+	id, err := services.PostStudent(sqlConnInterface, st)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		st.Id = int(id)
+		c.IndentedJSON(http.StatusCreated, st)
 	}
-	id, err := inResult.LastInsertId()
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
-	}
-	c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
+	// inResult, err := sqlConn.Exec("INSERT INTO student(fullname,birthday,phone_num,email) VALUES (?, ?, ?, ?)", st.FullName, st.BirthDay, st.PhoneNum, st.Email)
+	// if err != nil {
+	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
+	// 	return
+	// }
+	// id, err := inResult.LastInsertId()
+	// if err != nil {
+	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
+	// 	return
+	// }
+	// c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
 
 }

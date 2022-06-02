@@ -21,3 +21,15 @@ func GetStudentByID(iSQL interface{}, stID int) (models.Student, error) {
 		return st, nil
 	}
 }
+func PostStudent(iSQL interface{}, st models.Student) (int64, error) {
+	sqlConn := iSQL.(*sql.DB)
+	inResult, err := sqlConn.Exec("INSERT INTO student(fullname,birthday,phone_num,email) VALUES (?, ?, ?, ?)", st.FullName, st.BirthDay, st.PhoneNum, st.Email)
+	if err != nil {
+		return 0, err
+	}
+	id, err := inResult.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
