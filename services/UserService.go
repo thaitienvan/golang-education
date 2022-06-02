@@ -51,3 +51,17 @@ func GetStudent(iSQL interface{}) ([]models.Student, error) {
 	}
 	return students, nil
 }
+func DeleteStudentById(iSQL interface{}, id int) (bool, error) {
+	sqlConn := iSQL.(*sql.DB)
+
+	res, err := sqlConn.Exec("Delete from student where student_id = ? ", id)
+	if err != nil {
+		return false, err
+	} else {
+		count, err := res.RowsAffected()
+		if err != nil {
+			return false, err
+		}
+		return count > 0, nil
+	}
+}
