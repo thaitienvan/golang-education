@@ -21,6 +21,25 @@ func GetStudentByID(iSQL interface{}, stID int) (models.Student, error) {
 		return st, nil
 	}
 }
+func SearchStudentByName(iSQL interface{}, name string) ([]models.Student, error) {
+	sqlConn := iSQL.(*sql.DB)
+
+	var students []models.Student
+	stRows, err := sqlConn.Query("select * from student where fullname like ?", "%"+name+"%")
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	for stRows.Next() {
+		var st models.Student
+		stScan := stRows.Scan(&st.Id, &st.FullName, &st.BirthDay, &st.PhoneNum, &st.Email)
+		if stScan != nil {
+			return nil, errors.New(stScan.Error())
+		}
+		students = append(students, st)
+	}
+	return students, nil
+}
+
 func PostStudent(iSQL interface{}, st models.Student) (int64, error) {
 	sqlConn := iSQL.(*sql.DB)
 	inResult, err := sqlConn.Exec("INSERT INTO student(fullname,birthday,phone_num,email) VALUES (?, ?, ?, ?)", st.FullName, st.BirthDay, st.PhoneNum, st.Email)

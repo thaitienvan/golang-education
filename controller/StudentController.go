@@ -42,6 +42,7 @@ func PostStudent(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
+	// tientv commit this code
 	id, err := services.PostStudent(sqlConnInterface, st)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -49,16 +50,19 @@ func PostStudent(c *gin.Context) {
 		st.Id = int(id)
 		c.IndentedJSON(http.StatusCreated, st)
 	}
-	// inResult, err := sqlConn.Exec("INSERT INTO student(fullname,birthday,phone_num,email) VALUES (?, ?, ?, ?)", st.FullName, st.BirthDay, st.PhoneNum, st.Email)
-	// if err != nil {
-	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
-	// 	return
-	// }
-	// id, err := inResult.LastInsertId()
-	// if err != nil {
-	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err})
-	// 	return
-	// }
-	// c.IndentedJSON(http.StatusCreated, gin.H{"id": id})
-
+}
+func SearchStudent(c *gin.Context) {
+	name := c.Param("fullname")
+	sqlConnInterface, _ := c.Get("sqlConnection")
+	// tientv commit this code
+	st, err := services.SearchStudentByName(sqlConnInterface, name)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		if st == nil {
+			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User hasn't found"})
+			return
+		}
+		c.IndentedJSON(http.StatusCreated, st)
+	}
 }
