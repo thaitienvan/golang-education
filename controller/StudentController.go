@@ -66,3 +66,20 @@ func SearchStudent(c *gin.Context) {
 		c.IndentedJSON(http.StatusCreated, st)
 	}
 }
+func DeleteStudent(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errormessage": err.Error()})
+	}
+	sqlConnInterface, _ := c.Get("sqlConnection")
+	res, err := services.DeleteStudentById(sqlConnInterface, id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	if res {
+		c.IndentedJSON(http.StatusOK, gin.H{"Message": "Delete succesfullt"})
+	} else {
+		c.IndentedJSON(http.StatusOK, gin.H{"Message": "Student not found"})
+	}
+}

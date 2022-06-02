@@ -14,5 +14,6 @@ func main() {
 	router.GET("/student/:id", controller.GetStudentById)
 	router.POST("/student", controller.PostStudent)
 	router.GET("/searchstudent/:fullname", controller.SearchStudent)
+	router.DELETE("/student/:id", controller.DeleteStudent)
 	router.Run("localhost:8111")
 }
