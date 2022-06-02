@@ -3,6 +3,7 @@ package controller
 import (
 	"database/sql"
 	"interview/models"
+	"interview/services"
 	"net/http"
 	"strconv"
 
@@ -16,19 +17,13 @@ func GetStudentById(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Id must be number"})
 		return
 	}
-	var student models.Student
 	sqlConnInterface, _ := c.Get("sqlConnection")
-	sqlConn := sqlConnInterface.(*sql.DB)
-	row := sqlConn.QueryRow("select * from student where student_id = ?", id)
-
-	if rowScan := row.Scan(&student.Id, &student.FullName, &student.BirthDay, &student.PhoneNum, &student.Email); rowScan != nil {
-		if rowScan == sql.ErrNoRows {
-			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Student doesn't exits"})
-		}
+	st, err := services.GetStudentByID(sqlConnInterface, id)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 	} else {
-		c.IndentedJSON(http.StatusOK, student)
+		c.IndentedJSON(http.StatusOK, st)
 	}
-
 }
 func GetStudent(c *gin.Context) {
 	sqlConnInterface, _ := c.Get("sqlConnection")
