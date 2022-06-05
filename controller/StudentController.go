@@ -70,6 +70,7 @@ func DeleteStudent(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errormessage": err.Error()})
+		return
 	}
 	sqlConnInterface, _ := c.Get("sqlConnection")
 	res, err := services.DeleteStudentById(sqlConnInterface, id)
@@ -82,4 +83,18 @@ func DeleteStudent(c *gin.Context) {
 	} else {
 		c.IndentedJSON(http.StatusOK, gin.H{"Message": "Student not found"})
 	}
+}
+func FindStudentByYear(c *gin.Context) {
+	year, err := strconv.Atoi(c.Param("year"))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+	sqlConnInterface, _ := c.Get("sqlConnection")
+	res, err := services.FindStudentByYear(sqlConnInterface, year)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, res)
 }

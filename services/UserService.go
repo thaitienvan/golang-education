@@ -84,3 +84,21 @@ func DeleteStudentById(iSQL interface{}, id int) (bool, error) {
 		return count > 0, nil
 	}
 }
+func FindStudentByYear(iSQL interface{}, year int) ([]models.Student, error) {
+	sqlConn := iSQL.(*sql.DB)
+
+	var students []models.Student
+	stRows, err := sqlConn.Query("select * from student where YEAR(birthday) >= ?", year)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	for stRows.Next() {
+		var st models.Student
+		stScan := stRows.Scan(&st.Id, &st.FullName, &st.BirthDay, &st.PhoneNum, &st.Email)
+		if stScan != nil {
+			return nil, errors.New(stScan.Error())
+		}
+		students = append(students, st)
+	}
+	return students, nil
+}
